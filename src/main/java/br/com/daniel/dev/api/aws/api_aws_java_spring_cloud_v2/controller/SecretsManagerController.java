@@ -6,12 +6,9 @@ import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.dtos.out.ResponseS
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import software.amazon.awssdk.services.secretsmanager.model.ListSecretsResponse;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
