@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ApiAwsJavaSpringCloudV2ApplicationTests {
+class AppAwsLocalstackTest {
 
 	@Test
 	void contextLoads() {

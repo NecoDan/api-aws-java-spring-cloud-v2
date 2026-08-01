@@ -1,4 +1,4 @@
-package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.dtos.out;
+package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.secretsmanager.dtos.out;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

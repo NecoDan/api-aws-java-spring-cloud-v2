@@ -1,0 +1,11 @@
+2026-07-31T16:18:56.628-03:00  INFO 14472 --- [api-aws-java-spring-cloud-v2] [main] b.c.d.d.a.a.a.AppAwsLocalstack           : Starting AppAwsLocalstack using Java 21 with PID 14472 (C:\Projetos\aws-localstack-various\api-aws-java-spring-cloud-v2\target\classes started by dmssa in C:\Projetos\aws-localstack-various\api-aws-java-spring-cloud-v2)
+2026-07-31T16:18:56.630-03:00  INFO 14472 --- [api-aws-java-spring-cloud-v2] [main] b.c.d.d.a.a.a.AppAwsLocalstack           : No active profile set, falling back to 1 default profile: "default"
+2026-07-31T16:18:57.508-03:00  INFO 14472 --- [api-aws-java-spring-cloud-v2] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 9092 (http)
+2026-07-31T16:18:57.522-03:00  INFO 14472 --- [api-aws-java-spring-cloud-v2] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-07-31T16:18:57.523-03:00  INFO 14472 --- [api-aws-java-spring-cloud-v2] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
+2026-07-31T16:18:57.579-03:00  INFO 14472 --- [api-aws-java-spring-cloud-v2] [main] o.a.c.c.C.[.[.[/aws_localstack]          : Initializing Spring embedded WebApplicationContext
+2026-07-31T16:18:57.580-03:00  INFO 14472 --- [api-aws-java-spring-cloud-v2] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 892 ms
+2026-07-31T16:18:58.382-03:00  INFO 14472 --- [api-aws-java-spring-cloud-v2] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 9092 (http) with context path '/aws_localstack'
+2026-07-31T16:18:58.391-03:00  INFO 14472 --- [api-aws-java-spring-cloud-v2] [main] b.c.d.d.a.a.a.AppAwsLocalstack           : Started AppAwsLocalstack in 2.37 seconds (process running for 3.45)
+2026-07-31T16:19:49.043-03:00  INFO 14472 --- [api-aws-java-spring-cloud-v2] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-07-31T16:19:49.049-03:00  INFO 14472 --- [api-aws-java-spring-cloud-v2] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete

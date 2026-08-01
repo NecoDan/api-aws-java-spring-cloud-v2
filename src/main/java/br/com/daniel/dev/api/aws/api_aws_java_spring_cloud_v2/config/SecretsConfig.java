@@ -1,7 +1,7 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.config;
 
 
-import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.exceptions.IllegalAccessAwsException;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.secretsmanager.exceptions.IllegalAccessAwsException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,13 +17,13 @@ import java.util.Properties;
 @Getter
 @Component
 @Slf4j
-public class SecretsManagerConfig {
+public class SecretsConfig {
 
     private static final String LOCALSTACK_URL = "http://localhost:4566";
 
     private final SecretsManagerClient secretsManagerClient;
 
-    SecretsManagerConfig() {
+    SecretsConfig() {
 
         this.secretsManagerClient = SecretsManagerClient.builder()
                 .region(Region.SA_EAST_1)
