@@ -1,12 +1,14 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.database;
 
-import org.springframework.stereotype.Component;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
-import software.amazon.awssdk.enhanced.dynamodb.Key;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 
-@Component
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class DynamoDbTemplateRepositoryImpl<T> implements DynamoDbTemplateRepository<T> {
 
     protected final DynamoDbTable<T> dynamoDbTable;
@@ -18,7 +20,7 @@ public class DynamoDbTemplateRepositoryImpl<T> implements DynamoDbTemplateReposi
     }
 
     @Override
-    public T getById(String partitionKey) {
+    public T getById(String partitionKey) throws Exception {
         final var key = Key.builder()
                 .partitionValue(partitionKey)
                 .build();
@@ -27,7 +29,7 @@ public class DynamoDbTemplateRepositoryImpl<T> implements DynamoDbTemplateReposi
     }
 
     @Override
-    public T getById(String partitionKey, String sortKey) {
+    public T getById(String partitionKey, String sortKey) throws ResourceNotFoundException, Exception {
         Key key = Key.builder()
                 .partitionValue(partitionKey)
                 .sortValue(sortKey)
@@ -37,12 +39,12 @@ public class DynamoDbTemplateRepositoryImpl<T> implements DynamoDbTemplateReposi
     }
 
     @Override
-    public void save(T entity) {
+    public void save(T entity) throws Exception {
         dynamoDbTable.putItem(entity);
     }
 
     @Override
-    public void delete(String partitionKey) {
+    public void delete(String partitionKey) throws Exception {
         final var key = Key.builder()
                 .partitionValue(partitionKey)
                 .build();
@@ -51,7 +53,7 @@ public class DynamoDbTemplateRepositoryImpl<T> implements DynamoDbTemplateReposi
     }
 
     @Override
-    public void delete(String partitionKey, String sortKey) {
+    public void delete(String partitionKey, String sortKey) throws Exception {
         final var key = Key.builder()
                 .partitionValue(partitionKey)
                 .sortValue(sortKey)
@@ -61,7 +63,30 @@ public class DynamoDbTemplateRepositoryImpl<T> implements DynamoDbTemplateReposi
     }
 
     @Override
-    public void updateItem(T entity) {
+    public void updateItem(T entity) throws Exception {
         dynamoDbTable.updateItem(entity);
+    }
+
+    @Override
+    public List<T> findByAttribute(String attributeName,
+                                   String attributeValue) {
+        List<T> results = new ArrayList<>();
+
+        // Construir expressão para filtrar onde attributeName = :val`
+        var filterExpression = Expression.builder()
+                .expression("#attr = :val")
+                .expressionNames(Map.of("#attr", attributeName))
+                .expressionValues(Map.of(":val", AttributeValue.fromS(attributeValue)))
+                .build();
+
+        var scanRequest = ScanEnhancedRequest.builder()
+                .filterExpression(filterExpression)
+                .build();
+
+        dynamoDbTable.scan(scanRequest)
+                .items()
+                .forEach(results::add);
+
+        return results;
     }
 }

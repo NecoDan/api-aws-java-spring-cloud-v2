@@ -16,12 +16,13 @@ public class CustomerEntity implements Serializable {
     @Serial private static final long serialVersionUID = -1607433520779306156L;
 
     private String id;
+    private String dtCriacao;
     private Integer age;
     private String cpf;
     private String name;
     private BigDecimal income;
     private String location;
-    private String dataCriacao;
+    private String dtAtualizacao;
 
     @DynamoDbPartitionKey
     @DynamoDbAttribute("cod_idef_cliente")
@@ -30,8 +31,8 @@ public class CustomerEntity implements Serializable {
     }
 
     @DynamoDbAttribute("data_criacao")
-    public String getDataCriacao() {
-        return dataCriacao;
+    public String getDtCriacao() {
+        return dtCriacao;
     }
 
     @DynamoDbAttribute("idade")
@@ -57,5 +58,10 @@ public class CustomerEntity implements Serializable {
     @DynamoDbAttribute("sigla_estado")
     public String getLocation() {
         return location;
+    }
+
+    @DynamoDbAttribute("data_atualizacao")
+    public String getDtAtualizacao() {
+        return dtAtualizacao;
     }
 }

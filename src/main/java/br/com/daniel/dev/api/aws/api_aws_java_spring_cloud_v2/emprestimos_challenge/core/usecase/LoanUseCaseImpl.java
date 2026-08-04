@@ -1,7 +1,10 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.usecase;
 
-import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.adapter.in.mappers.LoanMapperImpl;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.adapter.mappers.CustomerMapper;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.adapter.mappers.LoanMapperImpl;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.model.Customer;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.model.Loan;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.port.CustomerPort;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.usecase.input.CustomerLoanInput;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.usecase.output.CustomerLoanOutput;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.usecase.output.LoanOutput;
@@ -19,14 +22,40 @@ import java.util.Objects;
 public class LoanUseCaseImpl implements LoanUseCase {
 
     private final LoanMapperImpl loanMapper;
+    private final CustomerMapper customerMapper;
+    private final CustomerPort customerPort;
 
     @Override
     public CustomerLoanOutput checkLoanEligibility(CustomerLoanInput input) {
-        log.info("Checking loan eligibility for customer: {}", input.toCustomer().getName());
+        log.info("Checking loan eligibility for customer: {}", input.name());
+        final var optionalCustomer = customerPort.buscarPorNumeroDocumentoCpf(input.cpf());
 
-        final var loan = loanMapper.toLoan(input.toCustomer());
+        if (optionalCustomer.isEmpty()) {
+            final var customerSaved = input.toCustomer();
+            customerPort.salvar(customerSaved);
+            return finalizeCheckLoanEligibility(customerSaved);
+        }
+
+        var customerUpdated = optionalCustomer.get();
+        updateCustomerData(customerUpdated, input);
+
+        return finalizeCheckLoanEligibility(customerUpdated);
+    }
+
+    private void updateCustomerData(Customer customerUpdate, CustomerLoanInput input) {
+        log.info("Updating customer data for: {}", customerUpdate.getId());
+
+        customerUpdate.setAge(input.age());
+        customerUpdate.setName(input.name());
+        customerUpdate.setIncome(input.income());
+        customerUpdate.generateDtAtualizacao();
+
+        customerPort.atualizar(customerUpdate);
+    }
+
+    private CustomerLoanOutput finalizeCheckLoanEligibility(Customer customer) {
+        final var loan = loanMapper.toLoan(customer);
         log.info("Loan eligibility check completed for customer: {}. Available loans: {}", loan.getCustomer().getName(), getListOfAvailableLoans(loan));
-
         return new CustomerLoanOutput(loan.getCustomer().getName(), getListOfAvailableLoans(loan));
     }
 

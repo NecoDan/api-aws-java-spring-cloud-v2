@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.br.CPF;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record CustomerLoanInput(@NotNull @Min(value = 18) Integer age,
                                 @CPF String cpf,
@@ -15,6 +17,17 @@ public record CustomerLoanInput(@NotNull @Min(value = 18) Integer age,
                                 @NotBlank String location) {
 
     public Customer toCustomer() {
-        return new Customer(age, cpf, name, income, location);
+        final var id = UUID.randomUUID().toString();
+        final var dataCriacao = LocalDateTime.now().toString();
+
+        return new Customer(id,
+                dataCriacao,
+                age,
+                cpf,
+                name,
+                income,
+                location,
+                null
+        );
     }
 }

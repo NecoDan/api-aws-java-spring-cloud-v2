@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @AllArgsConstructor
@@ -16,11 +17,14 @@ public class Customer implements Serializable {
 
     @Serial private static final long serialVersionUID = -4575723883575630710L;
 
+    private String id;
+    private String dtCriacao;
     private Integer age;
     private String cpf;
     private String name;
     private BigDecimal income;
     private String location;
+    private String dtAtualizacao;
 
     private boolean isIncomeValid() {
         return Objects.nonNull(this.income);
@@ -56,5 +60,16 @@ public class Customer implements Serializable {
         return StringUtils.isNoneEmpty(locationParam)
                 && StringUtils.isNoneEmpty(this.location)
                 && this.location.equalsIgnoreCase(locationParam);
+    }
+
+    public void generateDtAtualizacao() {
+        this.dtAtualizacao = LocalDateTime.now().toString();
+    }
+
+    public String toStringIdAndName() {
+        return "Customer{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                '}';
     }
 }
