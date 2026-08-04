@@ -29,6 +29,7 @@ public class CustomerDynamoAdapter implements CustomerPort {
             var customerEntity = customerMapper.toEntity(customer);
 
             customerRepositoryAdapter.save(customerEntity);
+            dynamoDbReadItemsTable.scallAllItems(DynamoDbConstants.TABLE_NAME_EMPRESTIMOS_CLIENTES);
             log.info("Cliente salvo com sucesso: {}", customer.getName());
         } catch (Exception e) {
             log.error("Erro ao salvar o cliente: {}. Detalhes do erro: {}", customer.getName(), e.getMessage(), e);

@@ -19,6 +19,7 @@ public class DynamoDbInicialize {
     private final DynamoDbReadItemsTable dynamoDbReadItemsTable;
 
     public void inicialize() {
+        dynamoDbDropTable.dropTableIfNeeded(DynamoDbConstants.TABLE_NAME_EMPRESTIMOS_CLIENTES);
         dynamoDbCreatorTable.createTableIfNeeded(createDbTableEmprestimosCliente());
         dynamoDbReadItemsTable.scallAllItems(DynamoDbConstants.TABLE_NAME_EMPRESTIMOS_CLIENTES);
     }

@@ -1,6 +1,5 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.usecase;
 
-import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.adapter.mappers.CustomerMapper;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.adapter.mappers.LoanMapperImpl;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.model.Customer;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.model.Loan;
@@ -22,7 +21,6 @@ import java.util.Objects;
 public class LoanUseCaseImpl implements LoanUseCase {
 
     private final LoanMapperImpl loanMapper;
-    private final CustomerMapper customerMapper;
     private final CustomerPort customerPort;
 
     @Override
@@ -43,11 +41,15 @@ public class LoanUseCaseImpl implements LoanUseCase {
     }
 
     private void updateCustomerData(Customer customerUpdate, CustomerLoanInput input) {
-        log.info("Updating customer data for: {}", customerUpdate.getId());
+        log.info("Atualizar dados cliente para o ID: {}", customerUpdate.getId());
 
-        customerUpdate.setAge(input.age());
+        if (input.age() > customerUpdate.getAge()) {
+            customerUpdate.setAge(input.age());
+        }
+
         customerUpdate.setName(input.name());
         customerUpdate.setIncome(input.income());
+        customerUpdate.setLocation(input.location());
         customerUpdate.generateDtAtualizacao();
 
         customerPort.atualizar(customerUpdate);
