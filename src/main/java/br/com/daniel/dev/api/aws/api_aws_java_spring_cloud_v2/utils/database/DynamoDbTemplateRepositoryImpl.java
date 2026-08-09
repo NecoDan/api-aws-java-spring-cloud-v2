@@ -3,7 +3,6 @@ package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.database;
 import software.amazon.awssdk.enhanced.dynamodb.*;
 import software.amazon.awssdk.enhanced.dynamodb.model.ScanEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,23 +18,15 @@ public class DynamoDbTemplateRepositoryImpl<T> implements DynamoDbTemplateReposi
         this.dynamoDbTable = enhancedClient.table(tableName, TableSchema.fromBean(clazz));
     }
 
-    @Override
-    public T getById(String partitionKey) throws Exception {
-        final var key = Key.builder()
-                .partitionValue(partitionKey)
-                .build();
 
-        return dynamoDbTable.getItem(r -> r.key(key));
+    @Override
+    public T getById(String partitionKey) {
+        return dynamoDbTable.getItem(r -> r.key(buildKeyFrom(partitionKey)));
     }
 
     @Override
-    public T getById(String partitionKey, String sortKey) throws ResourceNotFoundException, Exception {
-        Key key = Key.builder()
-                .partitionValue(partitionKey)
-                .sortValue(sortKey)
-                .build();
-
-        return dynamoDbTable.getItem(r -> r.key(key));
+    public T getById(String partitionKey, String sortKey) {
+        return dynamoDbTable.getItem(r -> r.key(buildKey(partitionKey, sortKey)));
     }
 
     @Override
@@ -45,21 +36,12 @@ public class DynamoDbTemplateRepositoryImpl<T> implements DynamoDbTemplateReposi
 
     @Override
     public void delete(String partitionKey) throws Exception {
-        final var key = Key.builder()
-                .partitionValue(partitionKey)
-                .build();
-
-        dynamoDbTable.deleteItem(r -> r.key(key));
+        dynamoDbTable.deleteItem(r -> r.key(buildKeyFrom(partitionKey)));
     }
 
     @Override
     public void delete(String partitionKey, String sortKey) throws Exception {
-        final var key = Key.builder()
-                .partitionValue(partitionKey)
-                .sortValue(sortKey)
-                .build();
-
-        dynamoDbTable.deleteItem(r -> r.key(key));
+        dynamoDbTable.deleteItem(r -> r.key(buildKey(partitionKey, sortKey)));
     }
 
     @Override
@@ -88,5 +70,18 @@ public class DynamoDbTemplateRepositoryImpl<T> implements DynamoDbTemplateReposi
                 .forEach(results::add);
 
         return results;
+    }
+
+    private Key buildKey(String partitionKey, String sortKey) {
+        return Key.builder()
+                .partitionValue(partitionKey)
+                .sortValue(sortKey)
+                .build();
+    }
+
+    private Key buildKeyFrom(String partitionKey) {
+        return Key.builder()
+                .partitionValue(partitionKey)
+                .build();
     }
 }

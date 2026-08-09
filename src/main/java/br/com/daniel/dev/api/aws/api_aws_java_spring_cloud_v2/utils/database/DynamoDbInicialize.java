@@ -1,23 +1,25 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.database;
 
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.InicializeComponent;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.database.operations.DynamoDbCreatorTable;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.database.operations.DynamoDbDropTable;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.database.operations.DynamoDbReadItemsTable;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.database.operations.DynamoDbTableTemplateModel;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.dynamodb.model.ProjectionType;
 
 import java.util.HashMap;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class DynamoDbInicialize {
+public class DynamoDbInicialize implements InicializeComponent {
 
     private final DynamoDbCreatorTable dynamoDbCreatorTable;
     private final DynamoDbDropTable dynamoDbDropTable;
     private final DynamoDbReadItemsTable dynamoDbReadItemsTable;
 
+    @Override
     public void inicialize() {
         dynamoDbDropTable.dropTableIfNeeded(DynamoDbConstants.TABLE_NAME_EMPRESTIMOS_CLIENTES);
         dynamoDbCreatorTable.createTableIfNeeded(createDbTableEmprestimosCliente());
