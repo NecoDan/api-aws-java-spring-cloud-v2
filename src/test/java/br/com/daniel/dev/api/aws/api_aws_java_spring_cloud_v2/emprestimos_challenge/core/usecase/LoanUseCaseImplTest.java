@@ -21,6 +21,9 @@ import java.math.RoundingMode;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class LoanUseCaseImplTest {
@@ -178,6 +181,63 @@ class LoanUseCaseImplTest {
                 });
 
         System.out.println(listOfAvailableLoans);
+    }
+
+    @Test
+    void shouldSaveNewCustomerWhenCpfIsNotRegistered() {
+        var customerLoanRequest = new CustomerLoanInput(
+                28,
+                "64810674061",
+                "Ana Silva",
+                getValueRoundingMode(5000.0D),
+                TipoEstado.SP.getCodigo()
+        );
+        var loan = loanMapper.toLoan(customerLoanRequest.toCustomer());
+        when(customerPort.buscarPorNumeroDocumentoCpf(customerLoanRequest.cpf())).thenReturn(java.util.Optional.empty());
+        when(loanMapperMock.toLoan(any(Customer.class))).thenReturn(loan);
+
+        var response = loanUseCase.checkLoanEligibility(customerLoanRequest);
+
+        assertNotNull(response);
+        assertEquals("Ana Silva", response.customer());
+        assertEquals(1, response.loans().size());
+        assertEquals(LoanType.CONSIGNMENT, response.loans().getFirst().type());
+        verify(customerPort).salvar(any(Customer.class));
+        verify(customerPort, never()).atualizar(any(Customer.class));
+    }
+
+    @Test
+    void shouldUpdateExistingCustomerWhenCpfAlreadyExists() {
+        var customerLoanRequest = new CustomerLoanInput(
+                32,
+                "64810674061",
+                "Maria Souza",
+                getValueRoundingMode(4200.0D),
+                TipoEstado.SP.getCodigo()
+        );
+        var existingCustomer = Customer.builder()
+                .id("customer-123")
+                .age(28)
+                .cpf(customerLoanRequest.cpf())
+                .name("Maria Antonia")
+                .income(getValueRoundingMode(2500.0D))
+                .location(TipoEstado.RJ.getCodigo())
+                .dtCriacao("2024-01-01T00:00:00")
+                .build();
+
+        when(customerPort.buscarPorNumeroDocumentoCpf(customerLoanRequest.cpf())).thenReturn(java.util.Optional.of(existingCustomer));
+        when(loanMapperMock.toLoan(any(Customer.class))).thenAnswer(invocation -> loanMapper.toLoan(invocation.getArgument(0)));
+
+        var response = loanUseCase.checkLoanEligibility(customerLoanRequest);
+
+        assertNotNull(response);
+        assertEquals("Maria Souza", existingCustomer.getName());
+        assertEquals(32, existingCustomer.getAge());
+        assertEquals(customerLoanRequest.income(), existingCustomer.getIncome());
+        assertEquals(TipoEstado.SP.getCodigo(), existingCustomer.getLocation());
+        assertNotNull(existingCustomer.getDtAtualizacao());
+        assertNotNull(response.customer());
+        verify(customerPort).atualizar(existingCustomer);
     }
 
     private BigDecimal getValueRoundingMode(double value) {
