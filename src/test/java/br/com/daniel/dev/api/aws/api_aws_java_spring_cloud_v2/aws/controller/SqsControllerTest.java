@@ -1,7 +1,7 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.aws.controller;
 
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.FunctionalUtils;
-import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.messages.operations.MessageSqsSendProducer;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.messages.operations.MessageSqsOperations;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,14 +24,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class SqsControllerTest {
 
     @Mock
-    private MessageSqsSendProducer messageSqsSendProducer;
+    private MessageSqsOperations sqsOperations;
 
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new SqsController(messageSqsSendProducer)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(new SqsController(sqsOperations)).build();
     }
 
     @Test
@@ -61,6 +61,6 @@ class SqsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Mensagem enviada com sucesso para fila SQS: customer-queue"));
 
-        verify(messageSqsSendProducer).sendMessage("customer-queue", expectedJson);
+        verify(sqsOperations).sendMessage("customer-queue", expectedJson);
     }
 }

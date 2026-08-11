@@ -1,8 +1,10 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
@@ -29,6 +31,7 @@ public class SqsClientConfig {
     private String secretAccessKey;
 
     @Bean
+    @Primary
     public AwsCredentialsProvider awsCredentialsProvider() {
         // * Use credenciais estáticas se propriedades explícitas estiverem configuradas.
         if (accessKeyId != null && !accessKeyId.isEmpty() &&
@@ -44,7 +47,7 @@ public class SqsClientConfig {
     }
 
     @Bean
-    public SqsClient sqsClient(AwsCredentialsProvider credentialsProvider) {
+    public SqsClient sqsClient(@Qualifier("awsCredentialsProvider") AwsCredentialsProvider credentialsProvider) {
         var builder = SqsClient.builder()
                 .region(Region.of(region))
                 .credentialsProvider(credentialsProvider);

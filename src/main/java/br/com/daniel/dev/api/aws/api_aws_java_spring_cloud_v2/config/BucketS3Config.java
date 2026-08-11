@@ -1,5 +1,6 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +35,7 @@ public class BucketS3Config {
     }
 
     @Bean
-    public S3Client s3Client(AwsCredentialsProvider credentialsProvider) {
+    public S3Client s3Client(@Qualifier("s3CredentialsProvider") AwsCredentialsProvider credentialsProvider) {
         var builder = S3Client.builder()
                 .region(Region.of(region))
                 .credentialsProvider(credentialsProvider)
