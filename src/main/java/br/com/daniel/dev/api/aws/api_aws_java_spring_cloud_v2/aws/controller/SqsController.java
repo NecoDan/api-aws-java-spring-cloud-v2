@@ -1,7 +1,7 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.aws.controller;
 
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.FunctionalUtils;
-import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.messages.operations.MessageSqsSendProducer;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.messages.operations.MessageSqsOperations;
 import lombok.*;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SqsController {
 
-    private final MessageSqsSendProducer messageSqsSendProducer;
+    private final MessageSqsOperations sqsOperations;
 
     @PostMapping(value = "/sqs/v1/payload_text_from_jsonbody", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getTextStringFromMessageBody(@RequestBody Map<String, Object> payload) {
@@ -33,16 +33,7 @@ public class SqsController {
         final var bodyMessage = FunctionalUtils.toStringJsonFrom(bodyMessagePayload);
         System.out.println(bodyMessage);
 
-        messageSqsSendProducer.sendMessage(queueName, bodyMessage);
+        sqsOperations.sendMessage(queueName, bodyMessage);
         return ResponseEntity.ok().body("Mensagem enviada com sucesso para fila SQS: %s".formatted(queueName));
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class ApiResponse<T> {
-        private String type;
-        private T payload;
     }
 }
