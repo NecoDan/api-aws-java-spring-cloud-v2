@@ -32,9 +32,7 @@ public class LoanCostumerConsumer {
             pollTimeoutSeconds = "5",
             maxMessagesPerPoll = "5"
     )
-    public void consumer(Acknowledgement acknowledgement,
-                         String sqsMessage) {
-
+    public void consumer(Acknowledgement acknowledgement, String sqsMessage) {
         MdcUtils.putTransactionIdRandom();
         log.info("Loan & costumer - Received message from messsage: {}", sqsMessage);
 

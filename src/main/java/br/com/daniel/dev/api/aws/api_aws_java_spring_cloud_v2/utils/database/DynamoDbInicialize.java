@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.dynamodb.model.ProjectionType;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -19,35 +20,19 @@ public class DynamoDbInicialize implements InicializeComponent {
     private final DynamoDbDropTable dynamoDbDropTable;
     private final DynamoDbReadItemsTable dynamoDbReadItemsTable;
 
+
     @Override
     public void inicialize() {
-        dynamoDbDropTable.dropTableIfNeeded(DynamoDbConstants.TABLE_NAME_EMPRESTIMOS_CLIENTES);
-        dynamoDbCreatorTable.createTableIfNeeded(createDbTableEmprestimosCliente());
-        dynamoDbReadItemsTable.scallAllItems(DynamoDbConstants.TABLE_NAME_EMPRESTIMOS_CLIENTES);
+        final List<DynamoDbTableTemplateModel> listTablesCreate = List.of(
+                createDbTableEmprestimosCliente(),
+                createDbTableHistoricoMovimentosCliente()
+        );
 
-        dynamoDbDropTable.dropTableIfNeeded(DynamoDbConstants.TABLE_NAME_HISTORICO_CLIENTE);
-        dynamoDbCreatorTable.createTableIfNeeded(createDbTableHistoricoMovimentosCliente());
-        dynamoDbReadItemsTable.scallAllItems(DynamoDbConstants.TABLE_NAME_HISTORICO_CLIENTE);
-    }
-
-    public DynamoDbTableTemplateModel createDbTableHistoricoMovimentosCliente() {
-        final var mapAttributeDefitions = new HashMap<String, String>();
-        mapAttributeDefitions.put(DynamoDbConstants.DEFAUL_KEY_CLIENTE_CODIGO, "S");
-        mapAttributeDefitions.put(DynamoDbConstants.DEFAUL_KEY_DATA_CRIACAO, "S");
-
-        return DynamoDbTableTemplateModel.builder()
-                .tableName(DynamoDbConstants.TABLE_NAME_EMPRESTIMOS_CLIENTES)
-                .attributeNameKeyHash(DynamoDbConstants.DEFAUL_KEY_CLIENTE_CODIGO)
-                .mapAttributeDefinitions(mapAttributeDefitions)
-                .templateGlobalSecondaryIndex(DynamoDbTableTemplateModel.TemplateGlobalSecondaryIndex.builder()
-                        .valueIndexName("DtCriacaoIndex")
-                        .attributeNameKeyRange(DynamoDbConstants.DEFAUL_KEY_DATA_CRIACAO)
-                        .build()
-                )
-                .projectionType(ProjectionType.ALL)
-                .readCapacityUnits(5L)
-                .writeCapacityUnits(5L)
-                .build();
+        for (var table : listTablesCreate) {
+            dynamoDbDropTable.dropTableIfNeeded(table.getTableName());
+            dynamoDbCreatorTable.createTableIfNeeded(table);
+            dynamoDbReadItemsTable.scallAllItems(table.getTableName());
+        }
     }
 
     public DynamoDbTableTemplateModel createDbTableEmprestimosCliente() {
@@ -60,12 +45,27 @@ public class DynamoDbInicialize implements InicializeComponent {
                 .tableName(DynamoDbConstants.TABLE_NAME_EMPRESTIMOS_CLIENTES)
                 .attributeNameKeyHash(DynamoDbConstants.DEFAUL_KEY_CLIENTE_CODIGO)
                 .mapAttributeDefinitions(mapAttributeDefitions)
-                .templateGlobalSecondaryIndex(DynamoDbTableTemplateModel.TemplateGlobalSecondaryIndex.builder()
-                        .valueIndexName("NumDocCpfIndex")
-                        .attributeNameKeyHash("num_documento_cpf")
-                        .attributeNameKeyRange(DynamoDbConstants.DEFAUL_KEY_DATA_CRIACAO)
-                        .build()
+                .templateGlobalSecondaryIndex(
+                        DynamoDbTableTemplateModel.TemplateGlobalSecondaryIndex.builder()
+                                .valueIndexName("NumDocCpfIndex")
+                                .attributeNameKeyHash("num_documento_cpf")
+                                .attributeNameKeyRange(DynamoDbConstants.DEFAUL_KEY_DATA_CRIACAO)
+                                .build()
                 )
+                .projectionType(ProjectionType.ALL)
+                .readCapacityUnits(5L)
+                .writeCapacityUnits(5L)
+                .build();
+    }
+
+    public DynamoDbTableTemplateModel createDbTableHistoricoMovimentosCliente() {
+        final var mapAttributeDefitions = new HashMap<String, String>();
+        mapAttributeDefitions.put("cod_idef_cli", "S");
+
+        return DynamoDbTableTemplateModel.builder()
+                .tableName(DynamoDbConstants.TABLE_NAME_HISTORICO_CLIENTE)
+                .attributeNameKeyHash("cod_idef_cli")
+                .mapAttributeDefinitions(mapAttributeDefitions)
                 .projectionType(ProjectionType.ALL)
                 .readCapacityUnits(5L)
                 .writeCapacityUnits(5L)

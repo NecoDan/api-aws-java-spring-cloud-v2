@@ -11,6 +11,6 @@ public record CustomerHistoryMovementInput(
 ) {
 
     public String toJsonString() {
-        return FunctionalUtils.toStringJson(this.getClass());
+        return FunctionalUtils.toStringJsonFrom(this);
     }
 }

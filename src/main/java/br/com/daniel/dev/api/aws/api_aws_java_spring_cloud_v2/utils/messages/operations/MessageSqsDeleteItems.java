@@ -14,7 +14,8 @@ public class MessageSqsDeleteItems extends MessageSqsTemplate {
         super(sqsClient);
     }
 
-    public void deleteMessage(String queueUrl, String receiptHandle) {
+    public void deleteMessage(String queueUrl,
+                              String receiptHandle) {
         try {
             final var deleteRequest = DeleteMessageRequest.builder()
                     .queueUrl(queueUrl)

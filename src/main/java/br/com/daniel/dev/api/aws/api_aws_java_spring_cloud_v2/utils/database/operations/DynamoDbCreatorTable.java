@@ -7,10 +7,7 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
 import software.amazon.awssdk.services.dynamodb.waiters.DynamoDbWaiter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -41,36 +38,12 @@ public class DynamoDbCreatorTable extends DynamoDbTableTemplate {
                 // 2. Definir os tipos de atributo para todas as chaves usadas na tabela e nos GSIs`
                 .attributeDefinitions(buildAttributeDefinitionFrom(dbTableTemplate.getMapAttributeDefinitions()))
                 // 3. (Opcional) Definir um Índice Secundário Global (GSI)`
-                .globalSecondaryIndexes(
-                        GlobalSecondaryIndex.builder()
-                                .indexName(dbTableTemplate.getTemplateGlobalSecondaryIndex().getValueIndexName())
-                                .keySchema(
-                                        KeySchemaElement.builder()
-                                                .attributeName(dbTableTemplate.getTemplateGlobalSecondaryIndex().getAttributeNameKeyHash())
-                                                .keyType(KeyType.HASH)
-                                                .build(),
-                                        KeySchemaElement.builder()
-                                                .attributeName(dbTableTemplate.getTemplateGlobalSecondaryIndex().getAttributeNameKeyRange())
-                                                .keyType(KeyType.RANGE)
-                                                .build()
-                                )
-                                .projection(
-                                        Projection.builder()
-                                                .projectionType(dbTableTemplate.getProjectionType())
-                                                .build()
-                                )
-                                .provisionedThroughput(ProvisionedThroughput.builder()
-                                        .readCapacityUnits(dbTableTemplate.getReadCapacityUnits())
-                                        .writeCapacityUnits(dbTableTemplate.getWriteCapacityUnits())
-                                        .build()
-                                )
-                                .build()
+                .globalSecondaryIndexes(Objects.isNull(dbTableTemplate.getTemplateGlobalSecondaryIndex())
+                        ? null
+                        : List.of(buildGlobalSecondaryIndex(dbTableTemplate))
                 )
                 // 4. Configuração de cobrança (Provisionado vs. Pague por requisição)`
-                .provisionedThroughput(ProvisionedThroughput.builder()
-                        .readCapacityUnits(dbTableTemplate.getReadCapacityUnits())
-                        .writeCapacityUnits(dbTableTemplate.getWriteCapacityUnits())
-                        .build()
+                .provisionedThroughput(buildProvisionedThroughput(dbTableTemplate)
                 )
                 .build();
 
@@ -85,6 +58,36 @@ public class DynamoDbCreatorTable extends DynamoDbTableTemplate {
             log.info("Table {} is now active and ready!", tableName);
             System.out.println("Table '" + tableName + "' is now active and ready!");
         }
+    }
+
+    private ProvisionedThroughput buildProvisionedThroughput(DynamoDbTableTemplateModel dbTableTemplate) {
+        return ProvisionedThroughput.builder()
+                .readCapacityUnits(dbTableTemplate.getReadCapacityUnits())
+                .writeCapacityUnits(dbTableTemplate.getWriteCapacityUnits())
+                .build();
+    }
+
+    private GlobalSecondaryIndex buildGlobalSecondaryIndex(DynamoDbTableTemplateModel dbTableTemplate) {
+        return GlobalSecondaryIndex.builder()
+                .indexName(dbTableTemplate.getTemplateGlobalSecondaryIndex().getValueIndexName())
+                .keySchema(
+                        KeySchemaElement.builder()
+                                .attributeName(dbTableTemplate.getTemplateGlobalSecondaryIndex().getAttributeNameKeyHash())
+                                .keyType(KeyType.HASH)
+                                .build(),
+                        KeySchemaElement.builder()
+                                .attributeName(dbTableTemplate.getTemplateGlobalSecondaryIndex().getAttributeNameKeyRange())
+                                .keyType(KeyType.RANGE)
+                                .build()
+                )
+                .projection(
+                        Projection.builder()
+                                .projectionType(dbTableTemplate.getProjectionType())
+                                .build()
+                )
+                .provisionedThroughput(buildProvisionedThroughput(dbTableTemplate)
+                )
+                .build();
     }
 
     private Collection<KeySchemaElement> buildKeySchemaElementFrom(final DynamoDbTableTemplateModel dbTableTemplate) {

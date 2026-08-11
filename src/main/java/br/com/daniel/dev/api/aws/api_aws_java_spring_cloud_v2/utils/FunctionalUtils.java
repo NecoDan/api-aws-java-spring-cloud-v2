@@ -43,6 +43,14 @@ public final class FunctionalUtils {
         }
     }
 
+    public static String toStringJsonFrom(Object object) {
+        try {
+            return MAPPER.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(String.format("Failed create e/or convert to JSON string object from value: %s", e.getMessage()));
+        }
+    }
+
     public static String formatCreationDate(LocalDateTime localDateTime) {
         return (Objects.isNull(localDateTime)) ? StringUtils.EMPTY : formatCreationDateBy(localDateTime);
     }

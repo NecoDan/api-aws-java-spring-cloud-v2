@@ -16,7 +16,7 @@ public class CustomerHistoryEntity implements Serializable {
     private String conteudoEmprestimos;
 
     @DynamoDbPartitionKey
-    @DynamoDbAttribute("cod_idef_cliente")
+    @DynamoDbAttribute("cod_idef_cli")
     public String getId() {
         return id;
     }
