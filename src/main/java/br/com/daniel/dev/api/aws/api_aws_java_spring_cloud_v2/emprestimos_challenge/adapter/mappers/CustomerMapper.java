@@ -1,7 +1,9 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.adapter.mappers;
 
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.adapter.out.entity.CustomerEntity;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.adapter.out.entity.CustomerHistoryEntity;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.model.Customer;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.model.CustomerHistory;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -15,4 +17,6 @@ public interface CustomerMapper {
     Customer toCustomer(CustomerEntity entity);
 
     Customer customerFrom(Customer customer);
+
+    CustomerHistoryEntity toCustomerHistoryEntity(CustomerHistory customerHistory);
 }

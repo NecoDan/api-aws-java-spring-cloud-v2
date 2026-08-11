@@ -1,8 +1,8 @@
-package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.secretsmanager.controller;
+package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.aws.controller;
 
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.config.SecretsConfig;
-import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.secretsmanager.dtos.in.RequestSecretsManagerDto;
-import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.secretsmanager.dtos.out.ResponseSecretsManagerDto;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.aws.dtos.in.RequestSecretsManagerDto;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.aws.dtos.out.ResponseSecretsManagerDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

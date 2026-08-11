@@ -1,5 +1,6 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.database.operations;
 
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.FunctionalUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +16,6 @@ import java.util.Map;
 @Component
 @Slf4j
 public class DynamoDbReadItemsTable extends DynamoDbTableTemplate {
-
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     protected DynamoDbReadItemsTable(DynamoDbClient dynamoDbClient) {
         super(dynamoDbClient);
@@ -49,7 +48,7 @@ public class DynamoDbReadItemsTable extends DynamoDbTableTemplate {
                 .toList();
 
         // 2. Converter a lista limpa em uma string JSON`
-        return GSON.toJson(simplifiedItems);
+        return FunctionalUtils.toStringJsonFromGSONBy(simplifiedItems);
     }
 
     private Map<String, Object> extractItemAttributes(Map<String, AttributeValue> item) {

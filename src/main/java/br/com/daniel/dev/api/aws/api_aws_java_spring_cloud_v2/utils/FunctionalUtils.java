@@ -1,5 +1,9 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -8,17 +12,36 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 public final class FunctionalUtils {
-    private FunctionalUtils() {
-        throw new IllegalStateException("This is a utility class FunctionalUtils and cannot be instantiated");
-    }
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static final String BR_DATETIME_FORMAT = "dd/MM/yyyy HH:mm:ss";
 
     private static final Locale PT_BR = new Locale.Builder().setLanguage("pt").setRegion("BR").build();
+
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    private FunctionalUtils() {
+        throw new IllegalStateException("This is a utility class FunctionalUtils and cannot be instantiated");
+    }
+
+    public static String toStringJsonFromGSONBy(List<Map<String, Object>> simplifiedItems) {
+        return GSON.toJson(simplifiedItems);
+    }
+
+    public static String toStringJson(Class<?> clazz) {
+        try {
+            return MAPPER.writeValueAsString(clazz);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(String.format("Failed create e/or convert to JSON string object from value: %s", e.getMessage()));
+        }
+    }
 
     public static String formatCreationDate(LocalDateTime localDateTime) {
         return (Objects.isNull(localDateTime)) ? StringUtils.EMPTY : formatCreationDateBy(localDateTime);

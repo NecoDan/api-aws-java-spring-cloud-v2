@@ -25,7 +25,7 @@ public class LoanUseCaseImpl implements LoanUseCase {
 
     @Override
     public CustomerLoanOutput checkLoanEligibility(CustomerLoanInput input) {
-        log.info("Checking loan eligibility for customer: {}", input.name());
+        log.info("Verificando elegibilidade de empréstimo para o cliente: {}", input.name());
         final var optionalCustomer = customerPort.buscarPorNumeroDocumentoCpf(input.cpf());
 
         if (optionalCustomer.isEmpty()) {
@@ -57,13 +57,23 @@ public class LoanUseCaseImpl implements LoanUseCase {
 
     private CustomerLoanOutput finalizeCheckLoanEligibility(Customer customer) {
         final var loan = loanMapper.toLoan(customer);
-        log.info("Loan eligibility check completed for customer: {}. Available loans: {}", loan.getCustomer().getName(), getListOfAvailableLoans(loan));
-        return new CustomerLoanOutput(loan.getCustomer().getName(), getListOfAvailableLoans(loan));
+
+        log.info("Verificação de elegibilidade de empréstimo concluída para o cliente: {} - {}. Empréstimos disponíveis: {}",
+                loan.getCustomer().getId(),
+                loan.getCustomer().getName(),
+                getListOfAvailableLoans(loan)
+        );
+
+        return new CustomerLoanOutput(
+                loan.getCustomer().getId(),
+                loan.getCustomer().getName(),
+                getListOfAvailableLoans(loan)
+        );
     }
 
     @Override
     public List<LoanOutput> getListOfAvailableLoans(Loan loan) {
-        log.info("Retrieving list of available loans for customer: {}", loan.getCustomer().getName());
+        log.info("Recuperando lista de empréstimos disponíveis para o cliente: {}", loan.getCustomer().getName());
         List<LoanOutput> list = new ArrayList<>();
 
         list.add(LoanOutput.toLoanResponseFrom(new Loan(loan.toAvailableLoansPersonal())));

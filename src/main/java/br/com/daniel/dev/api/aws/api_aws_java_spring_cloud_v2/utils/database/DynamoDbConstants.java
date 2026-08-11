@@ -7,4 +7,10 @@ public final class DynamoDbConstants {
     }
 
     public static final String TABLE_NAME_EMPRESTIMOS_CLIENTES = "emprestimos_cliente";
+    public static final String TABLE_NAME_HISTORICO_CLIENTE = "historico_movimento_cliente";
+
+    public static final String DEFAUL_KEY_CLIENTE_CODIGO = "cod_idef_cliente";
+
+    public static final String DEFAUL_KEY_DATA_CRIACAO = "data_criacao";
+
 }
