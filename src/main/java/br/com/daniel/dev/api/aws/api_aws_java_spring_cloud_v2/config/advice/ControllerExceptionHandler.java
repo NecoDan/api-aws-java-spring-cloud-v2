@@ -1,9 +1,9 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.config.advice;
 
 
-import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.exceptions.DataIntegrityViolationException;
-import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.exceptions.EntityCreateFailedException;
-import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.emprestimos_challenge.core.exceptions.EntityNotFoundException;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.exceptions.DataIntegrityViolationException;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.exceptions.EntityCreateFailedException;
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.exceptions.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

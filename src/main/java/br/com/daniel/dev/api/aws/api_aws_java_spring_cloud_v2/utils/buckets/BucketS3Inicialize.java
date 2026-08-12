@@ -4,6 +4,7 @@ import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.InicializeCo
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.buckets.operations.BucketS3Creator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,11 +13,13 @@ import org.springframework.stereotype.Component;
 public class BucketS3Inicialize implements InicializeComponent {
 
     private final BucketS3Creator bucketS3InicialeCreator;
-    private static final String BUCKET_NAME = "report-movimento-cliente";
+
+    @Value("${arquivo.s3.bucket.name.bucket-reports-mov-cli}")
+    private String bucketName;
 
     @Override
     public void inicialize() {
         log.info("Initializing Bucket S3 create");
-        bucketS3InicialeCreator.createBucketIfNotExists(BUCKET_NAME);
+        bucketS3InicialeCreator.createBucketIfNotExists(bucketName);
     }
 }

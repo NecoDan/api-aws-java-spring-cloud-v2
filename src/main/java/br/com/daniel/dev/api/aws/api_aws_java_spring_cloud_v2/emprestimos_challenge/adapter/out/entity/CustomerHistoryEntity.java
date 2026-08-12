@@ -12,13 +12,19 @@ import java.io.Serializable;
 public class CustomerHistoryEntity implements Serializable {
 
     private String id;
+    private String identificadorCliente;
     private String dtUltimaAtualizacao;
     private String conteudoEmprestimos;
 
     @DynamoDbPartitionKey
-    @DynamoDbAttribute("cod_idef_cli")
+    @DynamoDbAttribute("cod_idef")
     public String getId() {
         return id;
+    }
+
+    @DynamoDbAttribute("cod_idef_cli")
+    public String getIdentificadorCliente() {
+        return identificadorCliente;
     }
 
     @DynamoDbAttribute("data_ultima_atualizacao")

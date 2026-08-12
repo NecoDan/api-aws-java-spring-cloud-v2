@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -41,5 +43,15 @@ public class CustomerHistoryDynamoAdapter implements CustomerHistoryPort {
                     + e.getMessage(), e
             );
         }
+    }
+
+    @Override
+    public List<CustomerHistory> buscarMovimentosPor(final String identificadorCliente) {
+        log.info("Efetuar buscar de movimento(s) historico(s) do cliente por ID: {}", identificadorCliente);
+
+        return repositoryAdapter.buscarMovimentosPor(identificadorCliente)
+                .stream()
+                .map(customerMapper::toCustomerHistory)
+                .toList();
     }
 }

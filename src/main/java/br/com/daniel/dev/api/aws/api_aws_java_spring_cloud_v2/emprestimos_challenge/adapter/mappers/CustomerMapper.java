@@ -19,4 +19,6 @@ public interface CustomerMapper {
     Customer customerFrom(Customer customer);
 
     CustomerHistoryEntity toCustomerHistoryEntity(CustomerHistory customerHistory);
+
+    CustomerHistory toCustomerHistory(CustomerHistoryEntity entity);
 }

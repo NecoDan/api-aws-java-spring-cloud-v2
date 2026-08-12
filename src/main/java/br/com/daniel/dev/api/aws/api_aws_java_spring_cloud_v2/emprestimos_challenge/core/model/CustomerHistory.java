@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 public class CustomerHistory implements Serializable {
 
     private String id;
+    private String identificadorCliente;
     private String dtUltimaAtualizacao;
     private String conteudoEmprestimos;
 
@@ -24,6 +26,11 @@ public class CustomerHistory implements Serializable {
 
     public CustomerHistory gerarDtAtualizacao() {
         gerarDataAtualizacao();
+        return this;
+    }
+
+    public CustomerHistory gerarId() {
+        this.id = UUID.randomUUID().toString();
         return this;
     }
 }

@@ -1,13 +1,16 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.buckets.operations;
 
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.exceptions.AwsBucketS3AccessException;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.buckets.BucketS3Template;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -40,21 +43,54 @@ public class BucketS3Operations extends BucketS3Template {
                 .build();
 
         s3Client.deleteBucket(deleteBucketRequest);
+
         System.out.println("Bucket deleted: " + bucketName);
+        log.info("Bucket deleted: {}", bucketName);
     }
 
     /**
      * Object Operations (Files/Data)
      * Fazer upload de um arquivo local para um bucket do S3.
      */
-    public void uploadFile(String bucketName, String keyName, Path filePath) {
+    public void uploadFile(String bucketName,
+                           String keyName,
+                           Path filePath) {
         final var putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(keyName)
                 .build();
 
-        s3Client.putObject(putObjectRequest, RequestBody.fromFile(filePath));
+        s3Client.putObject(putObjectRequest,
+                RequestBody.fromFile(filePath)
+        );
+
         System.out.println("File uploaded successfully to key: " + keyName);
+        log.info("File uploaded successfully to key: {}.", keyName);
+    }
+
+    /**
+     * Object Operations (Files/Data)
+     * Fazer upload de um arquivo local para um bucket do S3.
+     */
+    public void uploadFileBy(String bucketName,
+                             String keyName,
+                             MultipartFile file) {
+        try {
+            final var putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(keyName)
+                    .contentType(file.getContentType())
+                    .build();
+
+            s3Client.putObject(putObjectRequest,
+                    RequestBody.fromBytes(file.getBytes())
+            );
+
+            System.out.println("File uploaded successfully to key: " + keyName);
+            log.info("File uploaded successfully to key: {}.", keyName);
+        } catch (IOException e) {
+            throw new AwsBucketS3AccessException(e);
+        }
     }
 
     /**
