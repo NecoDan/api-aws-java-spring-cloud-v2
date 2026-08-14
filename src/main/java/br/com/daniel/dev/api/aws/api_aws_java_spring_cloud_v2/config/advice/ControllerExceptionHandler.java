@@ -1,6 +1,7 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.config.advice;
 
 
+import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.exceptions.AwsSecretsManagerAccessException;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.exceptions.DataIntegrityViolationException;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.exceptions.EntityCreateFailedException;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.exceptions.EntityNotFoundException;
@@ -63,6 +64,19 @@ public class ControllerExceptionHandler {
                         .build()
                 );
     }
+
+    @ExceptionHandler(AwsSecretsManagerAccessException.class)
+    public ResponseEntity threatUnprocessableEntity(AwsSecretsManagerAccessException exception) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ExceptionHandlerDTO.builder()
+                        .message(exception.getMessage())
+                        .httpStatus(HttpStatus.NOT_FOUND)
+                        .build()
+                );
+    }
+
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity threatGeneralRuntimeException(RuntimeException exception) {

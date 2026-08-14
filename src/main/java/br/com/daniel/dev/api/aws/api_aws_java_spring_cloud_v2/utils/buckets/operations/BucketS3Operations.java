@@ -14,67 +14,132 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * Classe responsável por realizar operações em buckets S3 utilizando o cliente AWS SDK.
+ */
 @Component
 @Slf4j
 public class BucketS3Operations extends BucketS3Template {
 
+    /**
+     * @param s3Client Cliente S3 utilizado para realizar as operações.
+     */
     protected BucketS3Operations(S3Client s3Client) {
         super(s3Client);
     }
 
     /**
-     * Listar todos os buckets S3 disponíveis na conta.
+     * Lista todos os buckets S3 disponíveis na conta.
+     *
+     * @return Lista de nomes dos buckets disponíveis.
+     * @throws AwsBucketS3AccessException Se ocorrer algum erro ao acessar os buckets S3.
      */
-    public List<String> listBuckets() {
-        final var listBucketsResponse = s3Client.listBuckets();
-
-        return listBucketsResponse.buckets()
-                .stream()
-                .map(Bucket::name)
-                .toList();
+    public List<String> listBucketsNames() {
+        log.info("Listing all S3 buckets...");
+        try {
+            return s3Client.listBuckets()
+                    .buckets()
+                    .stream()
+                    .map(Bucket::name)
+                    .toList();
+        } catch (Exception e) {
+            System.err.printf("Error listing buckets: %sn", e.getMessage());
+            log.error("Error listing buckets: {}", e.getMessage());
+            throw new AwsBucketS3AccessException(e);
+        }
     }
 
     /**
-     * Excluir um bucket S3 existente (Ele deve estar vazio primeiro).
+     * Lista todos os buckets S3 disponíveis na conta.
+     *
+     * @return Lista de objetos Bucket representando os buckets disponíveis.
+     * @throws AwsBucketS3AccessException Se ocorrer algum erro ao acessar os buckets S3.
+     */
+    public List<Bucket> listBucketsAll() {
+        log.info("Listing all S3 buckets...");
+        try {
+            return s3Client.listBuckets()
+                    .buckets();
+        } catch (Exception e) {
+            System.err.printf("Error/failed listing buckets: %sn", e.getMessage());
+            log.error("Error/failed listing buckets: {}", e.getMessage());
+            throw new AwsBucketS3AccessException(e);
+        }
+    }
+
+    /**
+     * Exclui um bucket S3 existente. O bucket deve estar vazio antes de ser excluído.
+     *
+     * @param bucketName Nome do bucket a ser excluído.
+     * @throws AwsBucketS3AccessException Se ocorrer algum erro ao excluir o bucket S3.
      */
     public void deleteBucket(String bucketName) {
-        final var deleteBucketRequest = DeleteBucketRequest.builder()
-                .bucket(bucketName)
-                .build();
+        log.info("Deleting bucket: {}", bucketName);
+        try {
+            final var deleteBucketRequest = DeleteBucketRequest.builder()
+                    .bucket(bucketName)
+                    .build();
 
-        s3Client.deleteBucket(deleteBucketRequest);
+            s3Client.deleteBucket(deleteBucketRequest);
 
-        System.out.println("Bucket deleted: " + bucketName);
-        log.info("Bucket deleted: {}", bucketName);
+            System.out.println("Bucket deleted: " + bucketName);
+            log.info("Bucket deleted: {}", bucketName);
+        } catch (Exception e) {
+            System.err.printf("Error deleting bucket: %sn", e.getMessage());
+            log.error("Error deleting bucket: {}", e.getMessage());
+            throw new AwsBucketS3AccessException(e);
+        }
     }
 
     /**
-     * Object Operations (Files/Data)
-     * Fazer upload de um arquivo local para um bucket do S3.
+     * Faz upload de um arquivo local para um bucket do S3.
+     *
+     * @param bucketName Nome do bucket onde o arquivo será armazenado.
+     * @param keyName    Chave (nome do arquivo) no bucket.
+     * @param filePath   Caminho do arquivo local a ser enviado.
+     * @throws AwsBucketS3AccessException Se ocorrer algum erro ao fazer upload do arquivo para o bucket S3.
      */
     public void uploadFile(String bucketName,
                            String keyName,
                            Path filePath) {
-        final var putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(keyName)
-                .build();
+        log.info("Uploading file to bucket: {}, key: {}, filePath: {}", bucketName, keyName, filePath);
 
-        s3Client.putObject(putObjectRequest,
-                RequestBody.fromFile(filePath)
-        );
+        try {
+            final var putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(keyName)
+                    .build();
 
-        System.out.println("File uploaded successfully to key: " + keyName);
-        log.info("File uploaded successfully to key: {}.", keyName);
+            s3Client.putObject(putObjectRequest,
+                    RequestBody.fromFile(filePath)
+            );
+
+            System.out.println("File uploaded successfully to key: " + keyName);
+            log.info("File uploaded successfully to key: {}.", keyName);
+        } catch (Exception e) {
+            System.err.printf("Error uploading file to bucket: %s, key: %s, filePath: %s. Error: %s%n",
+                    bucketName, keyName, filePath, e.getMessage()
+            );
+            log.error("Error uploading file to bucket: {}, key: {}, filePath: {}. Error: {}",
+                    bucketName, keyName, filePath, e.getMessage()
+            );
+            throw new AwsBucketS3AccessException(e);
+        }
     }
 
     /**
-     * Object Operations (Files/Data)
-     * Fazer upload de um arquivo local para um bucket do S3.
+     * Faz upload de um arquivo recebido como MultipartFile para um bucket do S3.
+     *
+     * @param bucketName Nome do bucket onde o arquivo será armazenado.
+     * @param keyName    Chave (nome do arquivo) no bucket.
+     * @param file       Arquivo recebido como MultipartFile.
+     * @throws AwsBucketS3AccessException Se ocorrer algum erro ao fazer upload do arquivo para o bucket S3.
      */
     public void uploadFileBy(String bucketName,
                              String keyName,
                              MultipartFile file) {
+        log.info("Uploading file to bucket: {}, key: {}, fileName: {}", bucketName, keyName, file.getOriginalFilename());
+
         try {
             final var putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
@@ -82,58 +147,99 @@ public class BucketS3Operations extends BucketS3Template {
                     .contentType(file.getContentType())
                     .build();
 
-            s3Client.putObject(putObjectRequest,
-                    RequestBody.fromBytes(file.getBytes())
-            );
-
+            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
             System.out.println("File uploaded successfully to key: " + keyName);
             log.info("File uploaded successfully to key: {}.", keyName);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            System.err.printf("Error uploading file to bucket: %s, key: %s, fileName: %s. Error: %s%n",
+                    bucketName, keyName, file.getOriginalFilename(), e.getMessage()
+            );
+            log.error("Error uploading file to bucket: {}, key: {}, fileName: {}. Error: {}",
+                    bucketName, keyName, file.getOriginalFilename(), e.getMessage()
+            );
             throw new AwsBucketS3AccessException(e);
         }
     }
 
     /**
-     * Object Operations (Files/Data)
-     * Download objeto do S3 para um caminho de arquivo local.
+     * Faz download de um objeto do S3 para um caminho de arquivo local.
+     *
+     * @param bucketName      Nome do bucket onde o objeto está armazenado.
+     * @param keyName         Chave (nome do arquivo) no bucket.
+     * @param destinationPath Caminho local onde o arquivo será salvo.
+     * @throws AwsBucketS3AccessException Se ocorrer algum erro ao fazer download do objeto do bucket S3.
      */
     public void downloadFile(String bucketName, String keyName, Path destinationPath) {
-        final var getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(keyName)
-                .build();
+        log.info("");
 
-        s3Client.getObject(getObjectRequest, ResponseTransformer.toFile(destinationPath));
-        System.out.println("File downloaded successfully to: " + destinationPath);
+        try {
+            s3Client.getObject(GetObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(keyName)
+                            .build(),
+                    ResponseTransformer.toFile(destinationPath)
+            );
+            System.out.println("File downloaded successfully to: " + destinationPath);
+            log.info("File downloaded successfully to: {}.", destinationPath);
+        } catch (Exception e) {
+            System.err.printf("Error downloading file from bucket: %s, key: %s, destinationPath: %s. Error: %s%n",
+                    bucketName, keyName, destinationPath, e.getMessage()
+            );
+            log.error("Error downloading file from bucket: {}, key: {}, destinationPath: {}. Error: {}",
+                    bucketName, keyName, destinationPath, e.getMessage()
+            );
+            throw new AwsBucketS3AccessException(e);
+        }
     }
 
     /**
-     * Object Operations (Files/Data)
-     * Listar todas as chaves de objeto em um bucket específico.
+     * Lista todas as chaves de objetos em um bucket específico.
+     *
+     * @param bucketName Nome do bucket onde os objetos estão armazenados.
+     * @return Lista de chaves dos objetos no bucket.
+     * @throws AwsBucketS3AccessException Se ocorrer algum erro ao listar os objetos no bucket S3.
      */
     public List<String> listObjectsInBucket(String bucketName) {
-        final var listObjectsV2Request = ListObjectsV2Request.builder()
-                .bucket(bucketName)
-                .build();
+        log.info("Listing objects in bucket: {}", bucketName);
 
-        var listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
+        try {
+            var listObjectsV2Response = s3Client.listObjectsV2(ListObjectsV2Request.builder()
+                    .bucket(bucketName)
+                    .build()
+            );
 
-        return listObjectsV2Response.contents().stream()
-                .map(S3Object::key)
-                .toList();
+            return listObjectsV2Response.contents().stream()
+                    .map(S3Object::key)
+                    .toList();
+        } catch (Exception e) {
+            System.err.printf("Error listing objects in bucket: %s. Error: %s%n", bucketName, e.getMessage());
+            log.error("Error listing objects in bucket: {}. Error: {}", bucketName, e.getMessage());
+            throw new AwsBucketS3AccessException(e);
+        }
     }
 
     /**
-     * Object Operations (Files/Data)
-     * Excluir um único arquivo/objeto de um bucket S3.
+     * Exclui um único arquivo/objeto de um bucket S3.
+     *
+     * @param bucketName Nome do bucket onde o objeto está armazenado.
+     * @param keyName    Chave (nome do arquivo) do objeto a ser excluído.
+     * @throws AwsBucketS3AccessException Se ocorrer algum erro ao excluir o objeto do bucket S3.
      */
     public void deleteObject(String bucketName, String keyName) {
-        final var deleteObjectRequest = DeleteObjectRequest.builder()
-                .bucket(bucketName)
-                .key(keyName)
-                .build();
+        log.info("Deleting object from bucket: {}, key: {}", bucketName, keyName);
+        try {
+            final var deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(keyName)
+                    .build();
 
-        s3Client.deleteObject(deleteObjectRequest);
-        System.out.println("Object deleted: " + keyName);
+            s3Client.deleteObject(deleteObjectRequest);
+            System.out.println("Object deleted: " + keyName);
+            log.info("Object deleted: {}.", keyName);
+        } catch (Exception e) {
+            System.err.printf("Error deleting object from bucket: %s, key: %s. Error: %s%n", bucketName, keyName, e.getMessage());
+            log.error("Error deleting object from bucket: {}, key: {}. Error: {}", bucketName, keyName, e.getMessage());
+            throw new AwsBucketS3AccessException(e);
+        }
     }
 }

@@ -15,11 +15,11 @@ public class BucketS3Inicialize implements InicializeComponent {
     private final BucketS3Creator bucketS3InicialeCreator;
 
     @Value("${arquivo.s3.bucket.name.bucket-reports-mov-cli}")
-    private String bucketName;
+    private String bucketNameVar1;
 
     @Override
     public void inicialize() {
         log.info("Initializing Bucket S3 create");
-        bucketS3InicialeCreator.createBucketIfNotExists(bucketName);
+        bucketS3InicialeCreator.createBucketIfNotExists(bucketNameVar1);
     }
 }

@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,7 +35,9 @@ public class LoanController {
     public ResponseEntity<CustomerLoanOutput> customersLoans(@Valid @RequestBody CustomerLoanInput request) {
         try {
             MdcUtils.putTransactionIdRandom();
-            return ResponseEntity.ok().body(loanUseCase.checkLoanEligibility(request));
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(loanUseCase.checkLoanEligibility(request));
         } finally {
             MdcUtils.clear();
         }

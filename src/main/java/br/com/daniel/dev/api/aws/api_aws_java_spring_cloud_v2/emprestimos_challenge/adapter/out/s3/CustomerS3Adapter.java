@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -21,8 +23,12 @@ public class CustomerS3Adapter implements CustomerS3DataPort {
                                   MultipartFile file) {
         try {
             log.info("Iniciando o envio de dados para o bucket S3. Bucket: {}, Key: {}", bucketName, key);
+            bucketS3Operations.listBucketsNames();
+
             bucketS3Operations.uploadFileBy(bucketName, key, file);
             log.info("Dados enviados com sucesso para o bucket S3. Bucket: {}, Key: {}", bucketName, key);
+
+            log.info("Items contidos no bucket {}: {}", bucketName, bucketS3Operations.listObjectsInBucket(bucketName));
         } catch (Exception e) {
             log.error("Falha ao enviar dados para o bucket S3. Bucket: {}, Key: {}. Detalhes do erro: {}",
                     bucketName, key, e.getMessage(), e);

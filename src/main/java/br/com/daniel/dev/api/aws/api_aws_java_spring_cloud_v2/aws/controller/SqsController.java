@@ -18,14 +18,14 @@ public class SqsController {
 
     private final MessageSqsOperations sqsOperations;
 
-    @PostMapping(value = "/sqs/v1/payload_text_from_jsonbody", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/v1/configs/sqs/payload_text_from_jsonbody", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getTextStringFromMessageBody(@RequestBody Map<String, Object> payload) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(FunctionalUtils.toStringJsonFrom(payload));
     }
 
-    @PostMapping("/sqs/v1/publish_message")
+    @PostMapping("/v1/configs/sqs/publish_message")
     public ResponseEntity<String> postPublishMessage(
             @RequestHeader("queue_name") String queueName,
             @RequestBody Map<String, Object> bodyMessagePayload

@@ -25,6 +25,12 @@ public class LoanCostumerConsumer {
     private final CustomerMovementRecordUseCase customerMovementRecordUseCase;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Consome mensagens de uma fila SQS e processa os dados recebidos.
+     *
+     * @param acknowledgement Objeto para confirmar manualmente o processamento da mensagem.
+     * @param sqsMessage      A mensagem recebida da fila SQS em formato de string.
+     */
     @SqsListener(
             value = "${fila.receiver.name.sqs-solicitar-regitro-movimento-cliente}",
             acknowledgementMode = "MANUAL",

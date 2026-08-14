@@ -1,23 +1,62 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.database;
 
-import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
-
 import java.util.List;
 
 public interface DynamoDbTemplateRepository<T> {
 
-    void save(T item) throws Exception;
+    /**
+     * Salva um item na tabela.
+     *
+     * @param item Entidade a ser salva.
+     */
+    void save(T item);
 
-    T getById(String partitionKey) throws Exception;
+    /**
+     * Obtém um item da tabela pelo valor da chave de partição.
+     *
+     * @param partitionKey Valor da chave de partição.
+     * @return O item correspondente ou null se não encontrado.
+     */
+    T getById(String partitionKey);
 
-    T getById(String partitionKey, String sortKey) throws ResourceNotFoundException, Exception;
+    /**
+     * Obtém um item da tabela pelos valores da chave de partição e chave de ordenação.
+     *
+     * @param partitionKey Valor da chave de partição.
+     * @param sortKey Valor da chave de ordenação.
+     * @return O item correspondente ou null se não encontrado.
+     */
+    T getById(String partitionKey, String sortKey);
 
-    void delete(String partitionKey) throws Exception;
+    /**
+     * Exclui um item da tabela pelo valor da chave de partição.
+     *
+     * @param partitionKey Valor da chave de partição.
+     */
+    void delete(String partitionKey);
 
-    void delete(String partitionKey, String sortKey) throws Exception;
+    /**
+     * Exclui um item da tabela pelos valores da chave de partição e chave de ordenação.
+     *
+     * @param partitionKey Valor da chave de partição.
+     * @param sortKey Valor da chave de ordenação.
+     */
+    void delete(String partitionKey, String sortKey);
 
-    void updateItem(T entity) throws Exception;
+    /**
+     * Atualiza um item existente na tabela.
+     *
+     * @param entity Entidade a ser atualizada.
+     */
+    void updateItem(T entity);
 
+    /**
+     * Busca itens na tabela com base em um atributo específico.
+     *
+     * @param attributeName Nome do atributo a ser filtrado.
+     * @param attributeValue Valor do atributo a ser filtrado.
+     * @return Lista de itens que correspondem ao filtro.
+     */
     List<T> findByAttribute(String attributeName,
                             String attributeValue);
 
@@ -32,8 +71,4 @@ public interface DynamoDbTemplateRepository<T> {
     //    <T> PageIterable<T> scanAll(Class<?> clazz);
 
     //    <T> PageIterable<T> scanAll(Class<?> clazz, String indexName);
-
-    //    Object getById(String partitionKey);
-
-    //    Object getById(String partitionKey, String sortKey);
 }

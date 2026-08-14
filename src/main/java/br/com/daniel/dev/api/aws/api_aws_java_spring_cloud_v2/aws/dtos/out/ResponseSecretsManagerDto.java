@@ -1,28 +1,29 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.aws.dtos.out;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.lang3.StringUtils;
 
-import java.io.Serializable;
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public record ResponseSecretsManagerDto(
+        String secretName,
+        String secretValue,
+        String description,
+        String arn
+) {
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class ResponseSecretsManagerDto implements Serializable {
+    @JsonIgnore
+    public static ResponseSecretsManagerDto from(String secretName) {
+        return new ResponseSecretsManagerDto(secretName, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY);
+    }
 
-    @JsonProperty("secret_name")
-    private String secretName;
+    @JsonIgnore
+    public static ResponseSecretsManagerDto by(String secretName, String secretValue) {
+        return new ResponseSecretsManagerDto(secretName, secretValue, StringUtils.EMPTY, StringUtils.EMPTY);
+    }
 
-    @JsonProperty("secret_value")
-    private String secretValue;
-
-    @JsonProperty("description")
-    private String description;
-
-    @JsonProperty("arn")
-    private String arn;
+    @JsonIgnore
+    public static ResponseSecretsManagerDto to(String secretName, String description, String arn) {
+        return new ResponseSecretsManagerDto(secretName, StringUtils.EMPTY, description, arn);
+    }
 }

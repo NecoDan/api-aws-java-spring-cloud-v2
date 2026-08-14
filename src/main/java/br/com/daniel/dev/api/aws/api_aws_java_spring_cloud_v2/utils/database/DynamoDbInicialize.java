@@ -29,13 +29,13 @@ public class DynamoDbInicialize implements InicializeComponent {
         );
 
         for (var table : listTablesCreate) {
-            dynamoDbDropTable.dropTableIfNeeded(table.getTableName());
+            // dynamoDbDropTable.dropTableIfNeeded(table.getTableName());
             dynamoDbCreatorTable.createTableIfNeeded(table);
             dynamoDbReadItemsTable.scallAllItems(table.getTableName());
         }
     }
 
-    public DynamoDbTableTemplateModel createDbTableEmprestimosCliente() {
+    private DynamoDbTableTemplateModel createDbTableEmprestimosCliente() {
         final var mapAttributeDefitions = new HashMap<String, String>();
         mapAttributeDefitions.put(DynamoDbConstants.DEFAUL_KEY_CLIENTE_CODIGO, "S");
         mapAttributeDefitions.put(DynamoDbConstants.DEFAUL_KEY_DATA_CRIACAO, "S");
@@ -58,7 +58,7 @@ public class DynamoDbInicialize implements InicializeComponent {
                 .build();
     }
 
-    public DynamoDbTableTemplateModel createDbTableHistoricoMovimentosCliente() {
+    private DynamoDbTableTemplateModel createDbTableHistoricoMovimentosCliente() {
         final var mapAttributeDefitions = new HashMap<String, String>();
         mapAttributeDefitions.put("cod_idef_cli", "S");
 

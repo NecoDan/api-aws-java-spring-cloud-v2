@@ -1,19 +1,10 @@
 package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.aws.dtos.in;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-import java.io.Serializable;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class RequestSecretsManagerDto implements Serializable {
-
-    private String secretName;
-    private String secretValue;
-    private String description;
+public record RequestSecretsManagerDto(@NotBlank @NotNull String secretName,
+                                       @NotBlank @NotNull String secretValue,
+                                       @NotBlank @NotNull String description
+) {
 }

@@ -5,16 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDateTime;
@@ -24,6 +17,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Classe utilitária com múltiplas funções utilitárias.
+ * <p>
+ * <p>
+ * Esta classe fornece métodos para geração
+ *
+ * <p>Esta classe não pode ser instanciada.</p>
+ */
 public final class FunctionalUtils {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -38,10 +39,22 @@ public final class FunctionalUtils {
         throw new IllegalStateException("This is a utility class FunctionalUtils and cannot be instantiated");
     }
 
+    /**
+     * Converte uma lista de mapas simplificados para uma string JSON usando GSON.
+     *
+     * @param simplifiedItems A lista de mapas contendo os itens a serem convertidos.
+     * @return Uma string JSON representando os itens fornecidos.
+     */
     public static String toStringJsonFromGSONBy(List<Map<String, Object>> simplifiedItems) {
         return GSON.toJson(simplifiedItems);
     }
 
+    /**
+     * Converte uma classe para uma string JSON.
+     *
+     * @param clazz A classe a ser convertida.
+     * @return Uma string JSON representando a classe fornecida.
+     */
     public static String toStringJson(Class<?> clazz) {
         try {
             return MAPPER.writeValueAsString(clazz);
@@ -50,6 +63,12 @@ public final class FunctionalUtils {
         }
     }
 
+    /**
+     * Converte um objeto para uma string JSON.
+     *
+     * @param object O objeto a ser convertido.
+     * @return Uma string JSON representando o objeto fornecido.
+     */
     public static String toStringJsonFrom(Object object) {
         try {
             return MAPPER.writeValueAsString(object);
@@ -58,18 +77,37 @@ public final class FunctionalUtils {
         }
     }
 
+
     public static String formatCreationDate(LocalDateTime localDateTime) {
         return (Objects.isNull(localDateTime)) ? StringUtils.EMPTY : formatCreationDateBy(localDateTime);
     }
 
+    /**
+     * Formata uma data e hora no padrão brasileiro.
+     *
+     * @param localDateTime A data e hora a serem formatadas.
+     * @return Uma string formatada no padrão "dd/MM/yyyy HH:mm:ss".
+     */
     public static String formatCreationDateBy(LocalDateTime localDateTime) {
         return localDateTime.format(DateTimeFormatter.ofPattern(BR_DATETIME_FORMAT));
     }
 
+    /**
+     * Formata um número decimal para duas casas decimais.
+     *
+     * @param value O valor decimal a ser formatado.
+     * @return Uma string representando o número formatado.
+     */
     public static String formatDecimalNumberBy(Double value) {
         return formatDecimalNumber(BigDecimal.valueOf(value));
     }
 
+    /**
+     * Formata um número decimal para duas casas decimais.
+     *
+     * @param value O valor decimal em formato BigDecimal a ser formatado.
+     * @return Uma string representando o número formatado.
+     */
     public static String formatDecimalNumber(BigDecimal value) {
         validateValorNumericoFormatCasasDecimais(value);
         value = value.setScale(2, RoundingMode.HALF_UP);
@@ -81,6 +119,12 @@ public final class FunctionalUtils {
         return format.format(value);
     }
 
+    /**
+     * Formata um CPF no padrão brasileiro.
+     *
+     * @param cpf O CPF a ser formatado (apenas números).
+     * @return Uma string representando o CPF formatado no padrão "XXX.XXX.XXX-XX".
+     */
     public static String formatCpf(String cpf) {
         cpf = cpf.replaceAll("[^0-9]", ""); // Remover caracteres não numéricos
         return cpf.replaceAll("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
