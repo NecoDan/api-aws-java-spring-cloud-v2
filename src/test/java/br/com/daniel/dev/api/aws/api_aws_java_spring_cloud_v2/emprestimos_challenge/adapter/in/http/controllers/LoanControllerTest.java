@@ -60,7 +60,7 @@ class LoanControllerTest {
         mockMvc.perform(post("/loans/customer-loans")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.customerIdentifier").value("customer-123"))
                 .andExpect(jsonPath("$.customer").value("Ana Silva"))
                 .andExpect(jsonPath("$.loans[0].type").value("PERSONAL"))

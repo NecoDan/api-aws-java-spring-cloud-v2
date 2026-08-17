@@ -7,6 +7,7 @@ import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.secrets.Secr
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,7 @@ public class SecretsManagerController {
             @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
     })
     public ResponseEntity<ResponseSecretsManagerDto> postCreateValueSecretsManager(
-            @RequestBody RequestSecretsManagerDto payload
+            @Valid @RequestBody RequestSecretsManagerDto payload
     ) {
         try {
             MdcUtils.putTransactionIdRandom();

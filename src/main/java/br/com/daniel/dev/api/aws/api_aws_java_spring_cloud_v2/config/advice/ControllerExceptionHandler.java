@@ -7,9 +7,11 @@ import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.exceptions.EntityC
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.exceptions.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import software.amazon.awssdk.services.s3.model.BucketAlreadyExistsException;
 
 import java.util.Objects;
 
@@ -17,24 +19,36 @@ import java.util.Objects;
 public class ControllerExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity threatDuplicateEntity(DataIntegrityViolationException exception) {
+    public ResponseEntity<ErrorResponse> threatDuplicateEntity(DataIntegrityViolationException exception) {
 
         return ResponseEntity.badRequest()
-                .body(ExceptionHandlerDTO.builder()
+                .body((ErrorResponse) ExceptionHandlerDTO.builder()
                         .message(String.format("Erro ao cadastrar usuário ou usuário já cadastrado: %s.", exception.getMessage()))
                         .httpStatus(HttpStatus.BAD_REQUEST)
                         .build()
                 );
     }
 
+    @ExceptionHandler(BucketAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleBucketAlreadyExists(BucketAlreadyExistsException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body((ErrorResponse) ExceptionHandlerDTO.builder()
+                        .message(String.format("Erro ao criar bucket ou bucket existente: %s.", ex.getMessage()))
+                        .httpStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+                        .build()
+                );
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity threatArgumentNotValidExceptionBodyRequest(MethodArgumentNotValidException exception) {
+    public ResponseEntity<ErrorResponse> threatArgumentNotValidExceptionBodyRequest(MethodArgumentNotValidException exception) {
 
         final var field = Objects.requireNonNull(exception.getBindingResult().getFieldError()).getField();
 
         return ResponseEntity
                 .badRequest()
-                .body(ExceptionHandlerDTO.builder()
+                .body((ErrorResponse) ExceptionHandlerDTO.builder()
                         .message(String.format("Campo inválido e/ou inexistente (null): %s", field))
                         .httpStatus(HttpStatus.BAD_REQUEST)
                         .build()
@@ -42,11 +56,11 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity threatNotFound(EntityNotFoundException exception) {
+    public ResponseEntity<ErrorResponse> threatNotFound(EntityNotFoundException exception) {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(ExceptionHandlerDTO.builder()
+                .body((ErrorResponse) ExceptionHandlerDTO.builder()
                         .message(exception.getMessage())
                         .httpStatus(HttpStatus.NOT_FOUND)
                         .build()
@@ -54,11 +68,11 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler(EntityCreateFailedException.class)
-    public ResponseEntity threatUnprocessableEntity(EntityCreateFailedException exception) {
+    public ResponseEntity<ErrorResponse> threatUnprocessableEntity(EntityCreateFailedException exception) {
 
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(ExceptionHandlerDTO.builder()
+                .body((ErrorResponse) ExceptionHandlerDTO.builder()
                         .message(exception.getMessage())
                         .httpStatus(HttpStatus.UNPROCESSABLE_ENTITY)
                         .build()
@@ -66,11 +80,11 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler(AwsSecretsManagerAccessException.class)
-    public ResponseEntity threatUnprocessableEntity(AwsSecretsManagerAccessException exception) {
+    public ResponseEntity<ErrorResponse> threatUnprocessableEntity(AwsSecretsManagerAccessException exception) {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(ExceptionHandlerDTO.builder()
+                .body((ErrorResponse) ExceptionHandlerDTO.builder()
                         .message(exception.getMessage())
                         .httpStatus(HttpStatus.NOT_FOUND)
                         .build()
@@ -79,11 +93,11 @@ public class ControllerExceptionHandler {
 
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity threatGeneralRuntimeException(RuntimeException exception) {
+    public ResponseEntity<ErrorResponse> threatGeneralRuntimeException(RuntimeException exception) {
 
         return ResponseEntity
                 .internalServerError()
-                .body(ExceptionHandlerDTO.builder()
+                .body((ErrorResponse) ExceptionHandlerDTO.builder()
                         .message(exception.getMessage())
                         .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                         .build()
@@ -91,11 +105,11 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity threatGeneralException(Exception exception) {
+    public ResponseEntity<ErrorResponse> threatGeneralException(Exception exception) {
 
         return ResponseEntity
                 .internalServerError()
-                .body(ExceptionHandlerDTO.builder()
+                .body((ErrorResponse) ExceptionHandlerDTO.builder()
                         .message(exception.getMessage())
                         .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                         .build()

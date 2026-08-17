@@ -7,13 +7,44 @@ import org.apache.commons.lang3.StringUtils;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public record ResponseBucketDto(
         String name,
-        String arn
+        String arn,
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        Long size,
+        String owner,
+        String lastModified
 ) {
 
     @JsonIgnore
     public static ResponseBucketDto from(String name) {
-        return new ResponseBucketDto(name, StringUtils.EMPTY);
+        return new ResponseBucketDto(name,
+                StringUtils.EMPTY,
+                null,
+                StringUtils.EMPTY,
+                StringUtils.EMPTY
+        );
     }
 
+    @JsonIgnore
+    public static ResponseBucketDto of(String name, String arn) {
+        return new ResponseBucketDto(name,
+                arn,
+                null,
+                StringUtils.EMPTY,
+                StringUtils.EMPTY
+        );
+    }
+
+    @JsonIgnore
+    public static ResponseBucketDto by(String name,
+                                       Long size,
+                                       String owner,
+                                       String lastModified) {
+        return new ResponseBucketDto(name,
+                StringUtils.EMPTY,
+                size,
+                owner,
+                lastModified
+        );
+    }
 }
 

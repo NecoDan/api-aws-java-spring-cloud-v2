@@ -36,6 +36,7 @@ public class BucketS3Operations extends BucketS3Template {
      */
     public List<String> listBucketsNames() {
         log.info("Listing all S3 buckets...");
+
         try {
             return s3Client.listBuckets()
                     .buckets()
@@ -57,9 +58,9 @@ public class BucketS3Operations extends BucketS3Template {
      */
     public List<Bucket> listBucketsAll() {
         log.info("Listing all S3 buckets...");
+
         try {
-            return s3Client.listBuckets()
-                    .buckets();
+            return s3Client.listBuckets().buckets();
         } catch (Exception e) {
             System.err.printf("Error/failed listing buckets: %sn", e.getMessage());
             log.error("Error/failed listing buckets: {}", e.getMessage());
@@ -169,16 +170,19 @@ public class BucketS3Operations extends BucketS3Template {
      * @param destinationPath Caminho local onde o arquivo será salvo.
      * @throws AwsBucketS3AccessException Se ocorrer algum erro ao fazer download do objeto do bucket S3.
      */
-    public void downloadFile(String bucketName, String keyName, Path destinationPath) {
-        log.info("");
-
+    public void downloadFile(String bucketName,
+                             String keyName,
+                             Path destinationPath) {
         try {
+            log.info("Download file in bucket: {}. Key: {}.", bucketName, keyName);
+
             s3Client.getObject(GetObjectRequest.builder()
                             .bucket(bucketName)
                             .key(keyName)
                             .build(),
                     ResponseTransformer.toFile(destinationPath)
             );
+
             System.out.println("File downloaded successfully to: " + destinationPath);
             log.info("File downloaded successfully to: {}.", destinationPath);
         } catch (Exception e) {
@@ -208,9 +212,33 @@ public class BucketS3Operations extends BucketS3Template {
                     .build()
             );
 
-            return listObjectsV2Response.contents().stream()
+            return listObjectsV2Response.contents()
+                    .stream()
                     .map(S3Object::key)
                     .toList();
+        } catch (Exception e) {
+            System.err.printf("Error listing objects in bucket: %s. Error: %s%n", bucketName, e.getMessage());
+            log.error("Error listing objects in bucket: {}. Error: {}", bucketName, e.getMessage());
+            throw new AwsBucketS3AccessException(e);
+        }
+    }
+
+    /**
+     * Lista todas as chaves de objetos em um bucket específico.
+     *
+     * @param bucketName Nome do bucket onde os objetos estão armazenados.
+     * @return Lista de chaves dos objetos no bucket.
+     * @throws AwsBucketS3AccessException Se ocorrer algum erro ao listar os objetos no bucket S3.
+     */
+    public List<S3Object> listObjectsInBucketFrom(String bucketName) {
+        try {
+            log.info("Listing objects in bucket: {}", bucketName);
+
+            return s3Client.listObjectsV2(
+                    ListObjectsV2Request.builder()
+                            .bucket(bucketName)
+                            .build()
+            ).contents();
         } catch (Exception e) {
             System.err.printf("Error listing objects in bucket: %s. Error: %s%n", bucketName, e.getMessage());
             log.error("Error listing objects in bucket: {}. Error: {}", bucketName, e.getMessage());

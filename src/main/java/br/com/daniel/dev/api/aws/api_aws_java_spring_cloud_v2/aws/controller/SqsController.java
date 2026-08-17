@@ -2,6 +2,7 @@ package br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.aws.controller;
 
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.FunctionalUtils;
 import br.com.daniel.dev.api.aws.api_aws_java_spring_cloud_v2.utils.messages.operations.MessageSqsOperations;
+import jakarta.validation.Valid;
 import lombok.*;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +28,14 @@ public class SqsController {
 
     @PostMapping("/v1/configs/sqs/publish_message")
     public ResponseEntity<String> postPublishMessage(
-            @RequestHeader("queue_name") String queueName,
-            @RequestBody Map<String, Object> bodyMessagePayload
+            @Valid @RequestHeader("queue_name") String queueName,
+            @Valid @RequestBody Map<String, Object> bodyMessagePayload
     ) {
         final var bodyMessage = FunctionalUtils.toStringJsonFrom(bodyMessagePayload);
         System.out.println(bodyMessage);
 
         sqsOperations.sendMessage(queueName, bodyMessage);
-        return ResponseEntity.ok().body("Mensagem enviada com sucesso para fila SQS: %s".formatted(queueName));
+        return ResponseEntity.ok()
+                .body("Mensagem enviada com sucesso para fila SQS: %s".formatted(queueName));
     }
 }

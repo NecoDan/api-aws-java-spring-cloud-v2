@@ -31,6 +31,7 @@ class SqsControllerTest {
 
     @BeforeEach
     void setUp() {
+
         mockMvc = MockMvcBuilders.standaloneSetup(new SqsController(sqsOperations)).build();
     }
 
@@ -40,7 +41,7 @@ class SqsControllerTest {
         payload.put("name", "Ana");
         payload.put("amount", 10);
 
-        mockMvc.perform(post("/sqs/v1/payload_text_from_jsonbody")
+        mockMvc.perform(post("/v1/configs/sqs/payload_text_from_jsonbody")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(payload)))
                 .andExpect(status().isOk())
@@ -54,7 +55,7 @@ class SqsControllerTest {
         payload.put("amount", 1000);
         String expectedJson = FunctionalUtils.toStringJsonFrom(payload);
 
-        mockMvc.perform(post("/sqs/v1/publish_message")
+        mockMvc.perform(post("/v1/configs/sqs/publish_message")
                         .header("queue_name", "customer-queue")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(payload)))

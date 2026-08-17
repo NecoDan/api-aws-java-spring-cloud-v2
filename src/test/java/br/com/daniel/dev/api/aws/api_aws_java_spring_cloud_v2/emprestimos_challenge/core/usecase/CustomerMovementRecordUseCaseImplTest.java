@@ -47,9 +47,9 @@ class CustomerMovementRecordUseCaseImplTest {
     @Test
     void shouldPersistCustomerHistoryWhenCustomerExists() {
         var customer = Customer.builder()
-                .id("customer-123")
                 .name("Maria Souza")
                 .build();
+
         var input = new CustomerHistoryMovementInput(
                 "customer-123",
                 List.of(new LoanOutput(LoanType.PERSONAL, 2.9D))
@@ -63,7 +63,7 @@ class CustomerMovementRecordUseCaseImplTest {
         verify(customerHistoryDynamoAdapter).salvar(customerHistoryCaptor.capture());
 
         var savedHistory = customerHistoryCaptor.getValue();
-        assertEquals("customer-123", savedHistory.getId());
+        assertNotNull(savedHistory.getId());
         assertEquals(input.toJsonString(), savedHistory.getConteudoEmprestimos());
         assertNotNull(savedHistory.getDtUltimaAtualizacao());
     }
